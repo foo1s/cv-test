@@ -149,6 +149,10 @@ class App(customtkinter.CTk):
 
         # 创建第三页面
         self.third_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.third_frame.grid_columnconfigure(0, weight=1)
+        self.third_frame_text_1 = customtkinter.CTkLabel(self.third_frame, text="摄像机标定", font=large_font)
+        self.third_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
+
 
         # 创建第四页面
         self.fourth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -238,7 +242,7 @@ class App(customtkinter.CTk):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
     """
-    下面为与作业相关的函数
+    下面为与作业相关的函数,后期会进行简化
     """
 
     # 选择图像1
