@@ -162,7 +162,34 @@ class App(customtkinter.CTk):
 
         # 创建第六页面
         self.sixth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.sixth_frame.grid_columnconfigure(0, weight=1)
+        self.sixth_frame_text_1 = customtkinter.CTkLabel(self.sixth_frame, text="平行视图矫正", font=large_font)
+        self.sixth_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
 
+        self.image3_path = ""
+        self.image4_path = ""
+
+        self.label3 = customtkinter.CTkLabel(self.sixth_frame, text="输入图片一")
+        self.label3.grid(row=2, column=0, padx=20, pady=20)
+        self.button3 = customtkinter.CTkButton(self.sixth_frame, text="选择图片一", command=self.select_image3)
+        self.button3.grid(row=2, column=1, padx=20, pady=20)
+
+        self.label4 = customtkinter.CTkLabel(self.sixth_frame, text="输入图片二")
+        self.label4.grid(row=3, column=0, padx=20, pady=20)
+        self.button4 = customtkinter.CTkButton(self.sixth_frame, text="选择图片二", command=self.select_image4)
+        self.button4.grid(row=3, column=1, padx=20, pady=20)
+
+        self.pingxing_button = customtkinter.CTkButton(self.sixth_frame, text="平行视图矫正",
+                                                       command=self.find_fundamental_matrix)
+        self.pingxing_button.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
+
+        self.result_label_px = customtkinter.CTkLabel(self.sixth_frame, text="")
+        self.result_label_px.grid(row=5, column=0, columnspan=2, padx=20, pady=20)
+
+        self.image_label_1 = customtkinter.CTkLabel(self.sixth_frame, text="")
+        self.image_label_1.grid(row=6, column=0, padx=(20, 5), pady=20)
+        self.image_label_2 = customtkinter.CTkLabel(self.sixth_frame, text="")
+        self.image_label_2.grid(row=6, column=1, padx=(5, 20), pady=20)
         # 创建第七页面
         self.seventh_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
@@ -262,7 +289,7 @@ class App(customtkinter.CTk):
     def select_image3(self):
         self.image3_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
         print(f"Selected Image 1 Path: {self.image3_path}")  # 打印路径
-        if self.image1_path:
+        if self.image3_path:
             self.label3.configure(text=f"输入图片一: {self.image3_path.split('/')[-1]}")
 
     # 选择图像4
@@ -408,7 +435,8 @@ class App(customtkinter.CTk):
         self.image_label.image = new_img_tk
         self.result_label.configure(text="拼接成功: pinjie.png")
 
-    def rectify_stereo_cameras(self, imgL, imgR, ptsL, ptsR):
+    #平行视图矫正相关函数
+    def rectify_stereo_cameras(imgL, imgR, ptsL, ptsR, F):
         # 估计本质矩阵E
         h, w, _ = imgL.shape
         K = np.eye(3)  # 假设相机内参矩阵为单位矩阵，实际应用中应从相机标定得到
@@ -479,22 +507,34 @@ class App(customtkinter.CTk):
             cv.imwrite(pinxin_img_path1, imgL_rectified)
             cv.imwrite(pinxin_img_path2, imgR_rectified)
 
-            # 使用PIL显示拼接后的图片
+            # Load and resize the images using PIL
             px_img_pil_1 = Image.open(pinxin_img_path1)
+            px_img_pil_2 = Image.open(pinxin_img_path2)
+
+            # Define the size you want to resize the images to
+            max_size = (200, 150)  # For example, resize to a maximum of 300x300 pixels
+
+            # Resize the images
+            px_img_pil_1.thumbnail(max_size, Image.Resampling.LANCZOS)
+            px_img_pil_2.thumbnail(max_size, Image.Resampling.LANCZOS)
+
+            # Convert to ImageTk format
             px_img_tk_1 = ImageTk.PhotoImage(px_img_pil_1)
+            px_img_tk_2 = ImageTk.PhotoImage(px_img_pil_2)
+
+
             self.image_label_1.configure(image=px_img_tk_1)
             self.image_label_1.image = px_img_tk_1
-
-            px_img_pil_2 = Image.open(pinxin_img_path2)
-            px_img_tk_2 = ImageTk.PhotoImage(px_img_pil_2)
             self.image_label_2.configure(image=px_img_tk_2)
             self.image_label_2.image = px_img_tk_2
 
-            self.result_label.configure(text="平行视图: rectified_left.jpg，rectified_right.jpg 矫正成功")
+            self.result_label_px.configure(text="平行视图: rectified_left.jpg，rectified_right.jpg 矫正成功")
 
             print("矫正后的图像已保存。")
         else:
             print("未找到足够的匹配点。")
+
+
 
 if __name__ == "__main__":
     app = App()
