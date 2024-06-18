@@ -158,7 +158,47 @@ class App(customtkinter.CTk):
         self.fourth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
         # 创建第五页面
+        # self.fifth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        # self.fifth_frame.grid_columnconfigure(0, weight=1)
+        # self.fifth_frame_text_1 = customtkinter.CTkLabel(self.fifth_frame, text="给定图片的基础，单应矩阵估计", font=large_font)
+        # self.fifth_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
         self.fifth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.fifth_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        self.fifth_frame.grid_columnconfigure(0, weight=1)
+        self.fifth_frame.grid_columnconfigure(1, weight=1)
+        self.fifth_frame.grid_columnconfigure(2, weight=1)
+        self.fifth_frame.grid_columnconfigure(3, weight=1)
+
+        self.fifth_frame_text_1 = customtkinter.CTkLabel(self.fifth_frame, text="给定图片的基础，单应矩阵估计",
+                                                         font=large_font)
+        self.fifth_frame_text_1.grid(row=1, column=0, columnspan=4, padx=20, pady=10)
+
+        # 图片标签
+        self.image_label_left = customtkinter.CTkLabel(self.fifth_frame, text="左")
+        self.image_label_left.grid(row=2, column=2, padx=10, pady=10)
+        self.image_label_right = customtkinter.CTkLabel(self.fifth_frame, text="右")
+        self.image_label_right.grid(row=2, column=3, padx=10, pady=10)
+
+        # 设置按钮
+        self.feature_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="特征关系抽取",
+                                                                 command=self.extract_features)
+        self.feature_extraction_button.grid(row=3, column=0, columnspan=4, padx=20, pady=10)
+
+        # 结果展示图片
+        self.result_image_label = customtkinter.CTkLabel(self.fifth_frame, text="结果展示")
+        self.result_image_label.grid(row=4, column=0, columnspan=4, padx=20, pady=10)
+
+        # 矩阵抽取按钮
+        self.matrix_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="矩阵抽取",
+                                                                command=self.extract_matrix)
+        self.matrix_extraction_button.grid(row=5, column=0, columnspan=4, padx=20, pady=10)
+
+        # 矩阵展示
+        self.matrix_label_1 = customtkinter.CTkLabel(self.fifth_frame, text="")
+        self.matrix_label_1.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
+        self.matrix_label_2 = customtkinter.CTkLabel(self.fifth_frame, text="")
+        self.matrix_label_2.grid(row=6, column=2, columnspan=2, padx=10, pady=10)
+
 
         # 创建第六页面
         self.sixth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -169,12 +209,12 @@ class App(customtkinter.CTk):
         self.image3_path = ""
         self.image4_path = ""
 
-        self.label3 = customtkinter.CTkLabel(self.sixth_frame, text="输入图片一")
+        self.label3 = customtkinter.CTkLabel(self.sixth_frame, text="请输入平行视图左：")
         self.label3.grid(row=2, column=0, padx=20, pady=20)
         self.button3 = customtkinter.CTkButton(self.sixth_frame, text="选择图片一", command=self.select_image3)
         self.button3.grid(row=2, column=1, padx=20, pady=20)
 
-        self.label4 = customtkinter.CTkLabel(self.sixth_frame, text="输入图片二")
+        self.label4 = customtkinter.CTkLabel(self.sixth_frame, text="输入平行视图有右：")
         self.label4.grid(row=3, column=0, padx=20, pady=20)
         self.button4 = customtkinter.CTkButton(self.sixth_frame, text="选择图片二", command=self.select_image4)
         self.button4.grid(row=3, column=1, padx=20, pady=20)
@@ -299,6 +339,25 @@ class App(customtkinter.CTk):
         if self.image4_path:
             self.label4.configure(text=f"输入图片二: {self.image4_path.split('/')[-1]}")
 
+    # 加载本地图片
+    def load_images(self):
+        left_image_path = "D:/cv test/examples_作业/I1.bmp"
+        right_image_path = "D:/cv test/examples_作业/I2.bmp"
+
+        left_image = Image.open(left_image_path)
+        right_image = Image.open(right_image_path)
+
+        max_size = (200, 200)
+        left_image.thumbnail(max_size, Image.Resampling.LANCZOS)
+        right_image.thumbnail(max_size, Image.Resampling.LANCZOS)
+
+        self.left_image_tk = ImageTk.PhotoImage(left_image)
+        self.right_image_tk = ImageTk.PhotoImage(right_image)
+
+        self.image_label_left.configure(image=self.left_image_tk)
+        self.image_label_left.image = self.left_image_tk
+        self.image_label_right.configure(image=self.right_image_tk)
+        self.image_label_right.image = self.right_image_tk
 
     #图像拼接相关函数
     def sift_keypoints_detect(image):
@@ -522,7 +581,6 @@ class App(customtkinter.CTk):
             px_img_tk_1 = ImageTk.PhotoImage(px_img_pil_1)
             px_img_tk_2 = ImageTk.PhotoImage(px_img_pil_2)
 
-
             self.image_label_1.configure(image=px_img_tk_1)
             self.image_label_1.image = px_img_tk_1
             self.image_label_2.configure(image=px_img_tk_2)
@@ -534,7 +592,11 @@ class App(customtkinter.CTk):
         else:
             print("未找到足够的匹配点。")
 
+    def extract_features(self):
+        pass
 
+    def extract_matrix(self):
+        pass
 
 if __name__ == "__main__":
     app = App()
