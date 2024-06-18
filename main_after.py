@@ -138,7 +138,7 @@ class App(customtkinter.CTk):
         self.button2 = customtkinter.CTkButton(self.second_frame, text="选择图片二", command=self.select_image2)
         self.button2.grid(row=3, column=1, padx=20, pady=20)
 
-        self.concat_button = customtkinter.CTkButton(self.second_frame, text="图片拼接", command=self.concat_images)
+        self.concat_button = customtkinter.CTkButton(self.second_frame, text="图像拼接", command=self.concat_images)
         self.concat_button.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
 
         self.result_label = customtkinter.CTkLabel(self.second_frame, text="")
@@ -149,10 +149,6 @@ class App(customtkinter.CTk):
 
         # 创建第三页面
         self.third_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        self.third_frame.grid_columnconfigure(0, weight=1)
-        self.third_frame_text_1 = customtkinter.CTkLabel(self.third_frame, text="摄像机标定", font=large_font)
-        self.third_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
-
 
         # 创建第四页面
         self.fourth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -162,7 +158,33 @@ class App(customtkinter.CTk):
 
         # 创建第六页面
         self.sixth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.sixth_frame.grid_columnconfigure(0, weight=1)
+        self.sixth_frame_text_1 = customtkinter.CTkLabel(self.sixth_frame, text="平行视图矫正", font=large_font)
+        self.sixth_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
 
+        self.image3_path = ""
+        self.image4_path = ""
+
+        self.label3 = customtkinter.CTkLabel(self.sixth_frame, text="输入图片一")
+        self.label3.grid(row=2, column=0, padx=20, pady=20)
+        self.button3 = customtkinter.CTkButton(self.sixth_frame, text="选择图片一", command=self.select_image3)
+        self.button3.grid(row=2, column=1, padx=20, pady=20)
+
+        self.label4 = customtkinter.CTkLabel(self.sixth_frame, text="输入图片二")
+        self.label4.grid(row=3, column=0, padx=20, pady=20)
+        self.button4 = customtkinter.CTkButton(self.sixth_frame, text="选择图片二", command=self.select_image4)
+        self.button4.grid(row=3, column=1, padx=20, pady=20)
+
+        self.pingxing_button = customtkinter.CTkButton(self.sixth_frame, text="平行视图矫正", command=self.find_fundamental_matrix)
+        self.pingxing_button.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
+
+        self.result_label = customtkinter.CTkLabel(self.sixth_frame, text="")
+        self.result_label.grid(row=5, column=0, columnspan=2, padx=20, pady=20)
+
+        self.image_label_1 = customtkinter.CTkLabel(self.sixth_frame, text="")
+        self.image_label.grid(row=6, column=0, columnspan=2, padx=20, pady=20)
+        self.image_label_2 = customtkinter.CTkLabel(self.sixth_frame, text="")
+        self.image_label.grid(row=6, column=0, columnspan=2, padx=20, pady=20)
         # 创建第七页面
         self.seventh_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
@@ -251,6 +273,7 @@ class App(customtkinter.CTk):
         print(f"Selected Image 1 Path: {self.image1_path}")  # 打印路径
         if self.image1_path:
             self.label1.configure(text=f"输入图片一: {self.image1_path.split('/')[-1]}")
+
     # 选择图像2
     def select_image2(self):
         self.image2_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
@@ -258,7 +281,7 @@ class App(customtkinter.CTk):
         if self.image2_path:
             self.label2.configure(text=f"输入图片二: {self.image2_path.split('/')[-1]}")
 
-   # 选择图像3
+    # 选择图像3
     def select_image3(self):
         self.image3_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
         print(f"Selected Image 1 Path: {self.image3_path}")  # 打印路径
@@ -272,9 +295,8 @@ class App(customtkinter.CTk):
         if self.image4_path:
             self.label4.configure(text=f"输入图片二: {self.image4_path.split('/')[-1]}")
 
-
-    #图像拼接相关函数
-    def sift_keypoints_detect(image):
+    # 图像拼接相关函数
+    def sift_keypoints_detect(self, image):
         # 处理图像一般很少用到彩色信息，通常直接将图像转换为灰度图
         gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
@@ -296,7 +318,7 @@ class App(customtkinter.CTk):
         return keypoints_image, keypoints, features
 
     # 使用KNN检测来自左右图像的SIFT特征，随后进行匹配
-    def get_feature_point_ensemble(features_right, features_left):
+    def get_feature_point_ensemble(self, features_right, features_left):
         # 创建BFMatcher对象解决匹配
         bf = cv.BFMatcher()
         # knnMatch()函数：返回每个特征点的最佳匹配k个匹配点
@@ -318,7 +340,7 @@ class App(customtkinter.CTk):
         return good
 
     # 计算视角变换矩阵H，用H对右图进行变换并返回全景拼接图像
-    def Panorama_stitching(image_right, image_left):
+    def Panorama_stitching(self, image_right, image_left):
         _, keypoints_right, features_right = App.sift_keypoints_detect(image_right)
         _, keypoints_left, features_left = App.sift_keypoints_detect(image_left)
         goodMatch = App.get_feature_point_ensemble(features_right, features_left)
@@ -344,7 +366,7 @@ class App(customtkinter.CTk):
             Panorama = cv.warpPerspective(
                 image_right, Homography, (image_right.shape[1] + image_left.shape[1], image_right.shape[0]))
 
-            # cv.imshow("扭曲变换后的右图", Panorama)
+            cv.imshow("扭曲变换后的右图", Panorama)
             cv.waitKey(0)
             cv.destroyAllWindows()
             # 将左图加入到变换后的右图像的左端即获得最终图像
@@ -377,9 +399,6 @@ class App(customtkinter.CTk):
         keypoints_image_right, keypoints_right, features_right = App.sift_keypoints_detect(imb)
         keypoints_image_left, keypoints_left, features_left = App.sift_keypoints_detect(ima)
 
-        # 利用np.hstack()函数同时将原图和绘有关键特征点的图像沿着竖直方向(水平顺序)堆叠起来
-        #cv.imshow("左图关键特征点检测", np.hstack((ima, keypoints_image_left)))
-        # 一般在imshow后设置 waitKey(0) , 代表按任意键继续
         cv.waitKey(0)
         # 删除先前建立的窗口
         cv.destroyAllWindows()
@@ -408,6 +427,7 @@ class App(customtkinter.CTk):
         self.image_label.image = new_img_tk
         self.result_label.configure(text="拼接成功: pinjie.png")
 
+    # 平行试图矫正相关函数
     def rectify_stereo_cameras(self, imgL, imgR, ptsL, ptsR):
         # 估计本质矩阵E
         h, w, _ = imgL.shape
@@ -477,10 +497,10 @@ class App(customtkinter.CTk):
             pinxin_img_path1 = "rectified_left.jpg"
             pinxin_img_path2 = "rectified_right.jpg"
             cv.imwrite(pinxin_img_path1, imgL_rectified)
-            cv.imwrite(pinxin_img_path2, imgR_rectified)
+            cv.imwrite( pinxin_img_path2, imgR_rectified)
 
             # 使用PIL显示拼接后的图片
-            px_img_pil_1 = Image.open(pinxin_img_path1)
+            px_img_pil_1 = Image.open( pinxin_img_path1)
             px_img_tk_1 = ImageTk.PhotoImage(px_img_pil_1)
             self.image_label_1.configure(image=px_img_tk_1)
             self.image_label_1.image = px_img_tk_1
@@ -495,6 +515,9 @@ class App(customtkinter.CTk):
             print("矫正后的图像已保存。")
         else:
             print("未找到足够的匹配点。")
+
+
+
 
 if __name__ == "__main__":
     app = App()
