@@ -4,12 +4,6 @@ from PIL import Image, ImageTk
 import cv2 as cv
 from tkinter import filedialog
 import numpy as np
-# import torch
-# from transform import transforms
-# import resnet18
-# import o3d
-
-import matplotlib.pyplot as plt
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -159,8 +153,7 @@ class App(customtkinter.CTk):
         self.third_frame_text_1 = customtkinter.CTkLabel(self.third_frame, text="摄像机标定", font=large_font)
         self.third_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
 
-        self.calibrate_button = customtkinter.CTkButton(self.third_frame, text="选择标定图片(棋盘图片)",
-                                                        command=self.select_calibration_image)
+        self.calibrate_button = customtkinter.CTkButton(self.third_frame, text="选择标定图片(棋盘图片)", command=self.select_calibration_image)
         self.calibrate_button.grid(row=2, column=0, padx=20, pady=20)
 
         self.calibration_result_label = customtkinter.CTkLabel(self.third_frame, text="")
@@ -177,8 +170,7 @@ class App(customtkinter.CTk):
         self.select_button = customtkinter.CTkButton(self.fourth_frame, text="选择图像", command=self.select_image)
         self.select_button.grid(row=1, column=0, padx=20, pady=10)
 
-        self.reconstruct_button = customtkinter.CTkButton(self.fourth_frame, text="重构图像",
-                                                          command=self.reconstruct_image)
+        self.reconstruct_button = customtkinter.CTkButton(self.fourth_frame, text="重构图像", command=self.reconstruct_image)
         self.reconstruct_button.grid(row=2, column=0, padx=20, pady=10)
 
         self.reconstruct_result_label = customtkinter.CTkLabel(self.fourth_frame, text="")
@@ -189,76 +181,11 @@ class App(customtkinter.CTk):
 
         # 创建第五页面
         self.fifth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        self.fifth_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
-        self.fifth_frame.grid_columnconfigure(0, weight=1)
-        self.fifth_frame.grid_columnconfigure(3, weight=1)
-        self.fifth_frame.grid_rowconfigure(1, weight=1)
-        self.fifth_frame.grid_rowconfigure(4, weight=1)
-        # 页面5标题
-        self.fifth_frame_text_1 = customtkinter.CTkLabel(self.fifth_frame, text="给定图片的基础，单应矩阵估计", font=large_font)
-        self.fifth_frame_text_1.grid(row=1, column=0, columnspan=4, padx=20, pady=10)
-        # 加载图片并调整大小
-        left_image_5 = Image.open("I1.bmp")
-        right_image_5 = Image.open("I2.bmp")
-        max_size = (200, 150)
-        left_image_5.thumbnail(max_size, Image.Resampling.LANCZOS)
-        right_image_5.thumbnail(max_size, Image.Resampling.LANCZOS)
-        left_photo = ImageTk.PhotoImage(left_image_5)
-        right_photo = ImageTk.PhotoImage(right_image_5)
-        # 图片显示
-        self.image_label_left = customtkinter.CTkLabel(self.fifth_frame, image=left_photo, text="")
-        self.image_label_left.image = left_photo
-        self.image_label_left.grid(row=2, column=2, padx=10, pady=10)
-        self.image_label_right = customtkinter.CTkLabel(self.fifth_frame, image=right_photo, text="")
-        self.image_label_right.image = right_photo
-        self.image_label_right.grid(row=2, column=3, padx=10, pady=10)
-        # 设置特征关系抽取按钮
-        self.feature_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="特征关系抽取", command=self.extract_features)
-        self.feature_extraction_button.grid(row=3, column=0, columnspan=4, padx=20, pady=5)
-        # 结果展示图片
-        self.result_image_label_5 = customtkinter.CTkLabel(self.fifth_frame, text="")
-        self.result_image_label_5.grid(row=4, column=0, columnspan=4, padx=20, pady=5)
-        # 矩阵抽取按钮
-        self.matrix_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="矩阵抽取", command=self.matrix_features)
-        self.matrix_extraction_button.grid(row=5, column=0, columnspan=4, padx=20, pady=5)
-        # 矩阵展示
-        self.h = None
-        self.f = None
-        self.matrix_label_1 = customtkinter.CTkLabel(self.fifth_frame, text="")
-        self.matrix_label_1.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
-        self.matrix_label_2 = customtkinter.CTkLabel(self.fifth_frame, text="")
-        self.matrix_label_2.grid(row=6, column=2, columnspan=2, padx=10, pady=10)
 
         # 创建第六页面
         self.sixth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        self.sixth_frame.grid_columnconfigure(0, weight=1)
-        self.sixth_frame_text_1 = customtkinter.CTkLabel(self.sixth_frame, text="平行视图矫正", font=large_font)
-        self.sixth_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
+        
 
-        self.image3_path = ""
-        self.image4_path = ""
-
-        self.label3 = customtkinter.CTkLabel(self.sixth_frame, text="请输入平行视图左：")
-        self.label3.grid(row=2, column=0, padx=20, pady=20)
-        self.button3 = customtkinter.CTkButton(self.sixth_frame, text="选择图片一", command=self.select_image3)
-        self.button3.grid(row=2, column=1, padx=20, pady=20)
-
-        self.label4 = customtkinter.CTkLabel(self.sixth_frame, text="输入平行视图有右：")
-        self.label4.grid(row=3, column=0, padx=20, pady=20)
-        self.button4 = customtkinter.CTkButton(self.sixth_frame, text="选择图片二", command=self.select_image4)
-        self.button4.grid(row=3, column=1, padx=20, pady=20)
-
-        self.pingxing_button = customtkinter.CTkButton(self.sixth_frame, text="平行视图矫正",
-                                                       command=self.find_fundamental_matrix)
-        self.pingxing_button.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
-
-        self.result_label_px = customtkinter.CTkLabel(self.sixth_frame, text="")
-        self.result_label_px.grid(row=5, column=0, columnspan=2, padx=20, pady=20)
-
-        self.image_label_1 = customtkinter.CTkLabel(self.sixth_frame, text="")
-        self.image_label_1.grid(row=6, column=0, padx=(20, 5), pady=20)
-        self.image_label_2 = customtkinter.CTkLabel(self.sixth_frame, text="")
-        self.image_label_2.grid(row=6, column=1, padx=(5, 20), pady=20)
         # 创建第七页面
         self.seventh_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         self.seventh_frame.grid_columnconfigure(0, weight=1)
@@ -270,18 +197,15 @@ class App(customtkinter.CTk):
 
         self.label1_seventh = customtkinter.CTkLabel(self.seventh_frame, text="输入图片一")
         self.label1_seventh.grid(row=2, column=0, padx=20, pady=20)
-        self.button1_seventh = customtkinter.CTkButton(self.seventh_frame, text="选择图片一",
-                                                       command=self.select_image1_seventh)
+        self.button1_seventh = customtkinter.CTkButton(self.seventh_frame, text="选择图片一", command=self.select_image1_seventh)
         self.button1_seventh.grid(row=2, column=1, padx=20, pady=20)
 
         self.label2_seventh = customtkinter.CTkLabel(self.seventh_frame, text="输入图片二")
         self.label2_seventh.grid(row=3, column=0, padx=20, pady=20)
-        self.button2_seventh = customtkinter.CTkButton(self.seventh_frame, text="选择图片二",
-                                                       command=self.select_image2_seventh)
+        self.button2_seventh = customtkinter.CTkButton(self.seventh_frame, text="选择图片二", command=self.select_image2_seventh)
         self.button2_seventh.grid(row=3, column=1, padx=20, pady=20)
 
-        self.reconstruct_button_seventh = customtkinter.CTkButton(self.seventh_frame, text="欧式重构",
-                                                                  command=self.reconstruct_images)
+        self.reconstruct_button_seventh = customtkinter.CTkButton(self.seventh_frame, text="欧式重构", command=self.reconstruct_images)
         self.reconstruct_button_seventh.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
 
         self.reconstruct_result_label = customtkinter.CTkLabel(self.seventh_frame, text="")
@@ -366,7 +290,7 @@ class App(customtkinter.CTk):
         customtkinter.set_appearance_mode(new_appearance_mode)
 
     """
-    下面为与作业相关的函数,后期会进行简化
+    下面为与作业相关的函数
     """
 
     # 选择图像1
@@ -381,21 +305,6 @@ class App(customtkinter.CTk):
         print(f"Selected Image 2 Path: {self.image2_path}")  # 打印路径
         if self.image2_path:
             self.label2.configure(text=f"输入图片二: {self.image2_path.split('/')[-1]}")
-
-   # 选择图像3
-    def select_image3(self):
-        self.image3_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
-        print(f"Selected Image 1 Path: {self.image3_path}")  # 打印路径
-        if self.image3_path:
-            self.label3.configure(text=f"输入图片一: {self.image3_path.split('/')[-1]}")
-
-    # 选择图像4
-    def select_image4(self):
-        self.image4_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
-        print(f"Selected Image 2 Path: {self.image4_path}")  # 打印路径
-        if self.image4_path:
-            self.label4.configure(text=f"输入图片二: {self.image4_path.split('/')[-1]}")
-
     #图像拼接相关函数
     def sift_keypoints_detect(image):
         # 处理图像一般很少用到彩色信息，通常直接将图像转换为灰度图
@@ -467,7 +376,7 @@ class App(customtkinter.CTk):
             Panorama = cv.warpPerspective(
                 image_right, Homography, (image_right.shape[1] + image_left.shape[1], image_right.shape[0]))
 
-            # cv.imshow("扭曲变换后的右图", Panorama)
+            cv.imshow("扭曲变换后的右图", Panorama)
             cv.waitKey(0)
             cv.destroyAllWindows()
             # 将左图加入到变换后的右图像的左端即获得最终图像
@@ -530,210 +439,8 @@ class App(customtkinter.CTk):
         self.image_label.configure(image=new_img_tk)
         self.image_label.image = new_img_tk
         self.result_label.configure(text="拼接成功: pinjie.png")
-
-    #平行视图矫正相关函数
-    def rectify_stereo_cameras(imgL, imgR, ptsL, ptsR, F):
-        # 估计本质矩阵E
-        h, w, _ = imgL.shape
-        K = np.eye(3)  # 假设相机内参矩阵为单位矩阵，实际应用中应从相机标定得到
-        E, _ = cv.findEssentialMat(ptsL, ptsR, K)
-
-        # 从本质矩阵恢复旋转和平移
-        _, R, T, _ = cv.recoverPose(E, ptsL, ptsR, K)
-
-        # 将旋转矩阵转换为旋转向量
-        r, _ = cv.Rodrigues(R)
-
-        # 分别计算左右摄像机的旋转向量
-        rL = 0.5 * r
-        rR = -0.5 * r
-
-        # 计算左右摄像机的旋转矩阵
-        RL, _ = cv.Rodrigues(rL)
-        RR, _ = cv.Rodrigues(rR)
-
-        # 应用透视变换
-        H1 = np.dot(K, np.dot(RL, np.linalg.inv(K)))
-        H2 = np.dot(K, np.dot(RR, np.linalg.inv(K)))
-        imgL_rectified = cv.warpPerspective(imgL, H1, (w, h))
-        imgR_rectified = cv.warpPerspective(imgR, H2, (w, h))
-
-        return imgL_rectified, imgR_rectified
-
-    # 平行视图矫正
-    def find_fundamental_matrix(self):
-        if not self.image3_path or not self.image4_path:
-            self.result_label.configure(text="请选择两张图片")
-            return
-
-        imgL = cv.imread(self.image3_path)
-        imgR = cv.imread(self.image4_path)
-
-        # 检查照片是否已经加载
-        if imgL is None:
-            self.result_label.configure(text="无法加载输入图片一")
-            return
-        if imgR is None:
-            self.result_label.configure(text="无法加载输入图片二")
-            return
-
-        sift = cv.SIFT_create()
-        grayL = cv.cvtColor(imgL, cv.COLOR_BGR2GRAY)
-        grayR = cv.cvtColor(imgR, cv.COLOR_BGR2GRAY)
-        keypointsL, descriptorsL = sift.detectAndCompute(grayL, None)
-        keypointsR, descriptorsR = sift.detectAndCompute(grayR, None)
-
-        flann = cv.FlannBasedMatcher({'algorithm': 1, 'trees': 5}, {'checks': 50})
-        matches = flann.knnMatch(descriptorsL, descriptorsR, k=2)
-
-        good_matches = []
-        for m, n in matches:
-            if m.distance < 0.7 * n.distance:
-                good_matches.append(m)
-
-        if len(good_matches) >= 8:
-            ptsL = np.float32([keypointsL[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-            ptsR = np.float32([keypointsR[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-
-            imgL_rectified, imgR_rectified = App.rectify_stereo_cameras(imgL, imgR, ptsL, ptsR, None)
-
-            # 把图片拼接成全景图并保存
-            pinxin_img_path1 = "rectified_left.jpg"
-            pinxin_img_path2 = "rectified_right.jpg"
-            cv.imwrite(pinxin_img_path1, imgL_rectified)
-            cv.imwrite(pinxin_img_path2, imgR_rectified)
-
-            # Load and resize the images using PIL
-            px_img_pil_1 = Image.open(pinxin_img_path1)
-            px_img_pil_2 = Image.open(pinxin_img_path2)
-
-            # Define the size you want to resize the images to
-            max_size = (200, 150)  # For example, resize to a maximum of 300x300 pixels
-
-            px_img_pil_1.thumbnail(max_size, Image.Resampling.LANCZOS)
-            px_img_pil_2.thumbnail(max_size, Image.Resampling.LANCZOS)
-            px_img_tk_1 = ImageTk.PhotoImage(px_img_pil_1)
-            px_img_tk_2 = ImageTk.PhotoImage(px_img_pil_2)
-
-            self.image_label_1.configure(image=px_img_tk_1)
-            self.image_label_1.image = px_img_tk_1
-            self.image_label_2.configure(image=px_img_tk_2)
-            self.image_label_2.image = px_img_tk_2
-
-            self.result_label_px.configure(text="平行视图: rectified_left.jpg，rectified_right.jpg 矫正成功")
-
-            print("矫正后的图像已保存。")
-        else:
-            print("未找到足够的匹配点。")
-
-    # 特征图抽取
-    def extract_features(self):
-        img1 = cv.imread('I1.bmp', cv.IMREAD_GRAYSCALE)
-        img2 = cv.imread('I2.bmp', cv.IMREAD_GRAYSCALE)
-
-        # 初始化SIFT检测器
-        sift = cv.SIFT_create()
-
-        # 检测关键点和描述符
-        kp1, des1 = sift.detectAndCompute(img1, None)
-        kp2, des2 = sift.detectAndCompute(img2, None)
-
-        # 使用FLANN匹配器进行关键点匹配
-        index_params = dict(algorithm=1, trees=5)
-        search_params = dict(checks=50)
-        flann = cv.FlannBasedMatcher(index_params, search_params)
-        matches = flann.knnMatch(des1, des2, k=2)
-
-        # 应用比率测试以过滤好的匹配
-        good_matches = []
-        for m, n in matches:
-            if m.distance < 0.75 * n.distance:
-                good_matches.append(m)
-
-        # 绘制匹配结果
-        img_matches = cv.drawMatches(img1, kp1, img2, kp2, good_matches, None)
-        match_img_path = "img_matches.jpg"
-        cv.imwrite(match_img_path, img_matches)
-        match_img_pil = Image.open(match_img_path)
-        max_size_match = (200, 150)
-        match_img_pil.thumbnail(max_size_match, Image.Resampling.LANCZOS)
-        match_img_tk = ImageTk.PhotoImage(match_img_pil)
-
-        self.result_image_label_5.configure(image=match_img_tk)
-        self.result_image_label_5.image = match_img_tk
-        # plt.imshow(img_matches)
-        # plt.title('SIFT Matches')
-        # plt.show()
-
-    # 矩阵抽取
-    def matrix_features(self):
-        img1 = cv.imread('I1.bmp', cv.IMREAD_GRAYSCALE)
-        img2 = cv.imread('I2.bmp', cv.IMREAD_GRAYSCALE)
-
-        # 初始化SIFT检测器
-        sift = cv.SIFT_create()
-
-        # 检测关键点和描述符
-        kp1, des1 = sift.detectAndCompute(img1, None)
-        kp2, des2 = sift.detectAndCompute(img2, None)
-
-        # 使用FLANN匹配器进行关键点匹配
-        index_params = dict(algorithm=1, trees=5)
-        search_params = dict(checks=50)
-        flann = cv.FlannBasedMatcher(index_params, search_params)
-        matches = flann.knnMatch(des1, des2, k=2)
-
-        # 应用比率测试以过滤好的匹配
-        good_matches = []
-        for m, n in matches:
-            if m.distance < 0.75 * n.distance:
-                good_matches.append(m)
-
-        # 绘制匹配结果
-        img_matches = cv.drawMatches(img1, kp1, img2, kp2, good_matches, None)
-        match_img_path = "img_matches.jpg"
-        cv.imwrite(match_img_path, img_matches)
-        match_img_pil = Image.open(match_img_path)
-        max_size_match = (200, 150)
-        match_img_pil.thumbnail(max_size_match, Image.Resampling.LANCZOS)
-        match_img_tk = ImageTk.PhotoImage(match_img_pil)
-
-        # self.result_image_label_5.configure(image=match_img_tk)
-        # self.result_image_label_5.image = match_img_tk
-        # plt.imshow(img_matches)
-        # plt.title('SIFT Matches')
-        # plt.show()
-
-        # 提取好的匹配点坐标
-        points1 = np.zeros((len(good_matches), 2), dtype=np.float32)
-        points2 = np.zeros((len(good_matches), 2), dtype=np.float32)
-
-        for i, match in enumerate(good_matches):
-            points1[i, :] = kp1[match.queryIdx].pt
-            points2[i, :] = kp2[match.trainIdx].pt
-
-        # 检查是否有足够的匹配点进行四点法计算
-        if len(good_matches) >= 4:
-            # 取得分最高的四个匹配点
-            best_matches = sorted(good_matches, key=lambda x: x.distance)[:4]
-            selected_points1 = np.float32([kp1[m.queryIdx].pt for m in best_matches]).reshape(-1, 1, 2)
-            selected_points2 = np.float32([kp2[m.trainIdx].pt for m in best_matches]).reshape(-1, 1, 2)
-
-            # 计算单应矩阵
-            self.h, status = cv.findHomography(selected_points1, selected_points2, cv.RANSAC, 5.0)
-            print("使用自动选定的四个点计算的单应矩阵:\n", self.h)
-        else:
-            print("匹配点不足四对，无法使用四点法计算单应矩阵。")
-
-        # 计算基础矩阵
-        self.f, mask = cv.findFundamentalMat(points1, points2, cv.FM_8POINT)
-        print("基础矩阵:\n", self.f)
-        h_str = np.array2string(self.h, precision=2, separator=', ')
-        f_str = np.array2string(self.f, precision=2, separator=', ')
-        self.matrix_label_1.configure(text=f"Homography Matrix (h):\n{h_str}")
-        self.matrix_label_2.configure(text=f"Fundamental Matrix (f):\n{f_str}")
-
-        # 摄像机标定
+    
+# 摄像机标定
     def select_calibration_image(self):
         image_path = filedialog.askopenfilename()
         if image_path:
@@ -747,10 +454,9 @@ class App(customtkinter.CTk):
         dist = np.array([0.1, -0.25, 0, 0, 0])
         rvecs = [np.array([0.1, 0.2, 0.3])]
         tvecs = [np.array([10, 20, 30])]
-
+        
         calibration_result = f"内参矩阵:\n{mtx}\n\n畸变系数:\n{dist}\n\n旋转向量:\n{rvecs}\n\n平移向量:\n{tvecs}"
         self.calibration_result_label.configure(text=calibration_result)
-
     # def select_calibration_images(self):
     #     folder_path = filedialog.askdirectory()
     #     if folder_path:
@@ -788,16 +494,16 @@ class App(customtkinter.CTk):
     #         self.calibration_result_label.configure(text=calibration_result)
     #     else:
     #         self.calibration_result_label.configure(text="标定失败，请确保选择了正确的棋盘格图像")
-
+    
+    
     # 欧式重构
     def select_image1_seventh(self):
         self.image1_path_seventh = filedialog.askopenfilename()
         self.label1_seventh.configure(text=os.path.basename(self.image1_path_seventh))
-
     def select_image2_seventh(self):
         self.image2_path_seventh = filedialog.askopenfilename()
         self.label2_seventh.configure(text=os.path.basename(self.image2_path_seventh))
-
+        
     def reconstruct_images(self):
         if self.image1_path_seventh and self.image2_path_seventh:
             image1 = cv.imread(self.image1_path_seventh, cv.IMREAD_GRAYSCALE)
@@ -826,8 +532,8 @@ class App(customtkinter.CTk):
 
             # 计算本质矩阵
             K = np.array([[1000, 0, 320],
-                          [0, 1000, 240],
-                          [0, 0, 1]], dtype=np.float32)
+                        [0, 1000, 240],
+                        [0, 0, 1]], dtype=np.float32)
             E = K.T @ F @ K
 
             # 计算相对姿态（旋转和平移）
@@ -850,21 +556,19 @@ class App(customtkinter.CTk):
             for pt in reprojected_pts1:
                 cv.circle(reconstructed_image, tuple(pt.astype(int)), 5, (255, 255, 255), -1)
 
-            reconstructed_image_path = os.path.join(os.path.dirname(self.image1_path_seventh),
-                                                    "reconstructed_image.jpg")
+            reconstructed_image_path = os.path.join(os.path.dirname(self.image1_path_seventh), "reconstructed_image.jpg")
             cv.imwrite(reconstructed_image_path, reconstructed_image)
             self.reconstruct_result_label.configure(text="重构成功，图片保存至: " + reconstructed_image_path)
             self.show_reconstructed_image(reconstructed_image_path)
         else:
             self.reconstruct_result_label.configure(text="请先选择两张图片")
-
     def show_reconstructed_image(self, image_path):
         img = Image.open(image_path)
         img = img.resize((300, 200), Image.Resampling.LANCZOS)
         img = ImageTk.PhotoImage(img)
         self.reconstruct_image_label.configure(image=img)
         self.reconstruct_image_label.image = img
-
+    
     # 单视图重构
     def select_image(self):
         self.image_path = filedialog.askopenfilename()
@@ -926,7 +630,7 @@ class App(customtkinter.CTk):
         #     point_cloud_path = os.path.join(os.path.dirname(self.image_path), "reconstructed_point_cloud.ply")
         #     o3d.io.write_point_cloud(point_cloud_path, point_cloud)
         #     self.reconstruct_result_label.configure(text="重构成功，点云保存至: " + point_cloud_path)
-        # 
+        #
         #     # 显示深度图
         #     reconstructed_image_path = os.path.join(os.path.dirname(self.image_path), "reconstructed_image.jpg")
         #     cv.imwrite(reconstructed_image_path, depth_map_normalized)

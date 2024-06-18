@@ -4,11 +4,11 @@ import os
 
 # load images
 file_path = os.path.dirname(os.path.realpath(__file__))
-image_1 = customtkinter.CTkImage(light_image=Image.open(file_path + "/test_images/add_folder_dark.png"),
-                                 dark_image=Image.open(file_path + "/test_images/add_folder_light.png"),
+image_1 = customtkinter.CTkImage(light_image=Image.open(file_path + "/images/add_folder_dark.png"),
+                                 dark_image=Image.open(file_path + "/images/add_folder_light.png"),
                                  size=(30, 30))
-image_1.configure(dark_image=Image.open(file_path + "/test_images/add_folder_light.png"))
-image_2 = customtkinter.CTkImage(light_image=Image.open(file_path + "/test_images/bg_gradient.jpg"),
+image_1.configure(dark_image=Image.open(file_path + "/images/add_folder_light.png"))
+image_2 = customtkinter.CTkImage(light_image=Image.open(file_path + "/images/bg_gradient.jpg"),
                                  size=(30, 50))
 
 app = customtkinter.CTk()
@@ -35,7 +35,7 @@ label_1.configure(image=image_1)
 label_2 = customtkinter.CTkLabel(app, text="text", image=image_2, compound="right", fg_color="red", width=0, corner_radius=10)
 label_2.pack(padx=20, pady=20)
 
-label_3 = customtkinter.CTkLabel(app, image=ImageTk.PhotoImage(Image.open(file_path + "/test_images/bg_gradient.jpg").resize((300, 100))),
+label_3 = customtkinter.CTkLabel(app, image=ImageTk.PhotoImage(Image.open(file_path + "/images/bg_gradient.jpg").resize((300, 100))),
                                  text="", compound="right", fg_color="green", width=0)
 label_3.pack(padx=20, pady=20)
 

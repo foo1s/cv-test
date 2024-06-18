@@ -4,11 +4,6 @@ from PIL import Image, ImageTk
 import cv2 as cv
 from tkinter import filedialog
 import numpy as np
-# import torch
-# from transform import transforms
-# import resnet18
-# import o3d
-
 import matplotlib.pyplot as plt
 
 class App(customtkinter.CTk):
@@ -159,33 +154,9 @@ class App(customtkinter.CTk):
         self.third_frame_text_1 = customtkinter.CTkLabel(self.third_frame, text="摄像机标定", font=large_font)
         self.third_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
 
-        self.calibrate_button = customtkinter.CTkButton(self.third_frame, text="选择标定图片(棋盘图片)",
-                                                        command=self.select_calibration_image)
-        self.calibrate_button.grid(row=2, column=0, padx=20, pady=20)
-
-        self.calibration_result_label = customtkinter.CTkLabel(self.third_frame, text="")
-        self.calibration_result_label.grid(row=3, column=0, padx=20, pady=20)
-
 
         # 创建第四页面
         self.fourth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        self.fourth_frame.grid_columnconfigure(0, weight=1)
-
-        self.fourth_frame_text_1 = customtkinter.CTkLabel(self.fourth_frame, text="单视图三维重构", font=large_font)
-        self.fourth_frame_text_1.grid(row=0, column=0, padx=20, pady=10)
-
-        self.select_button = customtkinter.CTkButton(self.fourth_frame, text="选择图像", command=self.select_image)
-        self.select_button.grid(row=1, column=0, padx=20, pady=10)
-
-        self.reconstruct_button = customtkinter.CTkButton(self.fourth_frame, text="重构图像",
-                                                          command=self.reconstruct_image)
-        self.reconstruct_button.grid(row=2, column=0, padx=20, pady=10)
-
-        self.reconstruct_result_label = customtkinter.CTkLabel(self.fourth_frame, text="")
-        self.reconstruct_result_label.grid(row=3, column=0, padx=20, pady=10)
-
-        self.reconstruct_image_label = customtkinter.CTkLabel(self.fourth_frame, text="")
-        self.reconstruct_image_label.grid(row=4, column=0, padx=20, pady=10)
 
         # 创建第五页面
         self.fifth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -261,34 +232,6 @@ class App(customtkinter.CTk):
         self.image_label_2.grid(row=6, column=1, padx=(5, 20), pady=20)
         # 创建第七页面
         self.seventh_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        self.seventh_frame.grid_columnconfigure(0, weight=1)
-        self.seventh_frame_text_1 = customtkinter.CTkLabel(self.seventh_frame, text="欧式重构", font=large_font)
-        self.seventh_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
-
-        self.image1_path_seventh = ""
-        self.image2_path_seventh = ""
-
-        self.label1_seventh = customtkinter.CTkLabel(self.seventh_frame, text="输入图片一")
-        self.label1_seventh.grid(row=2, column=0, padx=20, pady=20)
-        self.button1_seventh = customtkinter.CTkButton(self.seventh_frame, text="选择图片一",
-                                                       command=self.select_image1_seventh)
-        self.button1_seventh.grid(row=2, column=1, padx=20, pady=20)
-
-        self.label2_seventh = customtkinter.CTkLabel(self.seventh_frame, text="输入图片二")
-        self.label2_seventh.grid(row=3, column=0, padx=20, pady=20)
-        self.button2_seventh = customtkinter.CTkButton(self.seventh_frame, text="选择图片二",
-                                                       command=self.select_image2_seventh)
-        self.button2_seventh.grid(row=3, column=1, padx=20, pady=20)
-
-        self.reconstruct_button_seventh = customtkinter.CTkButton(self.seventh_frame, text="欧式重构",
-                                                                  command=self.reconstruct_images)
-        self.reconstruct_button_seventh.grid(row=4, column=0, columnspan=2, padx=20, pady=20)
-
-        self.reconstruct_result_label = customtkinter.CTkLabel(self.seventh_frame, text="")
-        self.reconstruct_result_label.grid(row=5, column=0, columnspan=2, padx=20, pady=20)
-
-        self.reconstruct_image_label = customtkinter.CTkLabel(self.seventh_frame, text="")
-        self.reconstruct_image_label.grid(row=6, column=0, columnspan=2, padx=20, pady=20)
 
         # 选择默认框架
         self.select_frame_by_name("home")
@@ -733,213 +676,6 @@ class App(customtkinter.CTk):
         self.matrix_label_1.configure(text=f"Homography Matrix (h):\n{h_str}")
         self.matrix_label_2.configure(text=f"Fundamental Matrix (f):\n{f_str}")
 
-        # 摄像机标定
-    def select_calibration_image(self):
-        image_path = filedialog.askopenfilename()
-        if image_path:
-            self.show_calibration_result()
-
-    def show_calibration_result(self):
-        # 预定义的标定结果
-        mtx = np.array([[1000, 0, 320],
-                        [0, 1000, 240],
-                        [0, 0, 1]])
-        dist = np.array([0.1, -0.25, 0, 0, 0])
-        rvecs = [np.array([0.1, 0.2, 0.3])]
-        tvecs = [np.array([10, 20, 30])]
-
-        calibration_result = f"内参矩阵:\n{mtx}\n\n畸变系数:\n{dist}\n\n旋转向量:\n{rvecs}\n\n平移向量:\n{tvecs}"
-        self.calibration_result_label.configure(text=calibration_result)
-
-    # def select_calibration_images(self):
-    #     folder_path = filedialog.askdirectory()
-    #     if folder_path:
-    #         self.calibrate_camera(folder_path)
-
-    # def calibrate_camera(self, folder_path):
-    #     # 设置棋盘格尺寸
-    #     chessboard_size = (9, 6)
-    #     # 设置棋盘格内角点的世界坐标
-    #     objp = np.zeros((chessboard_size[0]*chessboard_size[1], 3), np.float32)
-    #     objp[:, :2] = np.mgrid[0:chessboard_size[0], 0:chessboard_size[1]].T.reshape(-1, 2)
-
-    #     # 存储所有图像的对象点和图像点
-    #     objpoints = []
-    #     imgpoints = []
-
-    #     # 读取文件夹中的所有图像
-    #     images = [os.path.join(folder_path, fname) for fname in os.listdir(folder_path) if fname.endswith(('.png', '.jpg', '.jpeg'))]
-
-    #     for image_path in images:
-    #         img = cv.imread(image_path)
-    #         gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-    #         # 找到棋盘格角点
-    #         ret, corners = cv.findChessboardCorners(gray, chessboard_size, None)
-
-    #         if ret:
-    #             objpoints.append(objp)
-    #             imgpoints.append(corners)
-
-    #     # 标定摄像机
-    #     ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-    #     if ret:
-    #         calibration_result = f"内参矩阵:\n{mtx}\n\n畸变系数:\n{dist}\n\n旋转向量:\n{rvecs}\n\n平移向量:\n{tvecs}"
-    #         self.calibration_result_label.configure(text=calibration_result)
-    #     else:
-    #         self.calibration_result_label.configure(text="标定失败，请确保选择了正确的棋盘格图像")
-
-    # 欧式重构
-    def select_image1_seventh(self):
-        self.image1_path_seventh = filedialog.askopenfilename()
-        self.label1_seventh.configure(text=os.path.basename(self.image1_path_seventh))
-
-    def select_image2_seventh(self):
-        self.image2_path_seventh = filedialog.askopenfilename()
-        self.label2_seventh.configure(text=os.path.basename(self.image2_path_seventh))
-
-    def reconstruct_images(self):
-        if self.image1_path_seventh and self.image2_path_seventh:
-            image1 = cv.imread(self.image1_path_seventh, cv.IMREAD_GRAYSCALE)
-            image2 = cv.imread(self.image2_path_seventh, cv.IMREAD_GRAYSCALE)
-
-            # 计算特征点和匹配
-            orb = cv.ORB_create()
-            kp1, des1 = orb.detectAndCompute(image1, None)
-            kp2, des2 = orb.detectAndCompute(image2, None)
-            bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
-            matches = bf.match(des1, des2)
-            matches = sorted(matches, key=lambda x: x.distance)
-
-            # 选择前50个匹配点
-            pts1 = np.float32([kp1[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
-            pts2 = np.float32([kp2[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
-
-            # 计算基础矩阵
-            F, mask = cv.findFundamentalMat(pts1, pts2, cv.FM_LMEDS)
-            pts1 = pts1[mask.ravel() == 1]
-            pts2 = pts2[mask.ravel() == 1]
-
-            if len(pts1) < 8 or len(pts2) < 8:
-                self.reconstruct_result_label.configure(text="匹配点不足，无法进行重构")
-                return
-
-            # 计算本质矩阵
-            K = np.array([[1000, 0, 320],
-                          [0, 1000, 240],
-                          [0, 0, 1]], dtype=np.float32)
-            E = K.T @ F @ K
-
-            # 计算相对姿态（旋转和平移）
-            _, R, t, mask_pose = cv.recoverPose(E, pts1, pts2, K)
-
-            # 重构图像
-            h, w = image1.shape
-            P1 = np.hstack((np.eye(3), np.zeros((3, 1))))
-            P2 = np.hstack((R, t))
-            P1 = K @ P1
-            P2 = K @ P2
-
-            pts1_3d_hom = cv.triangulatePoints(P1, P2, pts1.T, pts2.T)
-            pts1_3d = pts1_3d_hom[:3] / pts1_3d_hom[3]
-
-            reprojected_pts1, _ = cv.projectPoints(pts1_3d.T, np.zeros((3, 1)), np.zeros((3, 1)), K, np.zeros(5))
-            reprojected_pts1 = reprojected_pts1.reshape(-1, 2)
-
-            reconstructed_image = cv.cvtColor(image1, cv.COLOR_GRAY2BGR)
-            for pt in reprojected_pts1:
-                cv.circle(reconstructed_image, tuple(pt.astype(int)), 5, (255, 255, 255), -1)
-
-            reconstructed_image_path = os.path.join(os.path.dirname(self.image1_path_seventh),
-                                                    "reconstructed_image.jpg")
-            cv.imwrite(reconstructed_image_path, reconstructed_image)
-            self.reconstruct_result_label.configure(text="重构成功，图片保存至: " + reconstructed_image_path)
-            self.show_reconstructed_image(reconstructed_image_path)
-        else:
-            self.reconstruct_result_label.configure(text="请先选择两张图片")
-
-    def show_reconstructed_image(self, image_path):
-        img = Image.open(image_path)
-        img = img.resize((300, 200), Image.Resampling.LANCZOS)
-        img = ImageTk.PhotoImage(img)
-        self.reconstruct_image_label.configure(image=img)
-        self.reconstruct_image_label.image = img
-
-    # 单视图重构
-    def select_image(self):
-        self.image_path = filedialog.askopenfilename()
-        self.reconstruct_result_label.configure(text=os.path.basename(self.image_path))
-
-    def reconstruct_image(self):
-        pass
-        # if self.image_path:
-        #     # 加载图像
-        #     image = cv.imread(self.image_path)
-        #     image_rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-        #     pil_image = Image.fromarray(image_rgb)
-        #
-        #     # 图像预处理
-        #     transform = transforms.Compose([
-        #         transforms.Resize((256, 256)),
-        #         transforms.ToTensor(),
-        #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        #     ])
-        #     input_tensor = transform(pil_image).unsqueeze(0)
-        #
-        #     # 加载预训练深度估计模型
-        #     model = resnet18(pretrained=True)
-        #     model.fc = torch.nn.Linear(model.fc.in_features, 1)
-        #     model.load_state_dict(torch.load("path_to_pretrained_model.pth"))
-        #     model.eval()
-        #
-        #     # 预测深度图
-        #     with torch.no_grad():
-        #         depth_map = model(input_tensor).squeeze().numpy()
-        #
-        #     # 将深度图归一化为0-255并转换为8位图像
-        #     depth_map_normalized = cv.normalize(depth_map, None, 0, 255, cv.NORM_MINMAX).astype(np.uint8)
-        #
-        #     # 重构三维点云
-        #     h, w = depth_map.shape
-        #     fx, fy = 500, 500  # 假设的焦距
-        #     cx, cy = w // 2, h // 2  # 假设的主点
-        #     points = []
-        #     colors = []
-        #
-        #     for v in range(h):
-        #         for u in range(w):
-        #             z = depth_map[v, u]
-        #             x = (u - cx) * z / fx
-        #             y = (v - cy) * z / fy
-        #             points.append([x, y, z])
-        #             colors.append(image_rgb[v, u] / 255.0)
-        #
-        #     points = np.array(points)
-        #     colors = np.array(colors)
-        #
-        #     # 创建点云对象
-        #     point_cloud = o3d.geometry.PointCloud()
-        #     point_cloud.points = o3d.utility.Vector3dVector(points)
-        #     point_cloud.colors = o3d.utility.Vector3dVector(colors)
-        #
-        #     # 保存点云
-        #     point_cloud_path = os.path.join(os.path.dirname(self.image_path), "reconstructed_point_cloud.ply")
-        #     o3d.io.write_point_cloud(point_cloud_path, point_cloud)
-        #     self.reconstruct_result_label.configure(text="重构成功，点云保存至: " + point_cloud_path)
-        # 
-        #     # 显示深度图
-        #     reconstructed_image_path = os.path.join(os.path.dirname(self.image_path), "reconstructed_image.jpg")
-        #     cv.imwrite(reconstructed_image_path, depth_map_normalized)
-        #     self.show_reconstructed_image(reconstructed_image_path)
-        # else:
-        #     self.reconstruct_result_label.configure(text="请先选择一张图片")
-
-    def show_reconstructed_image(self, image_path):
-        img = Image.open(image_path)
-        img = img.resize((300, 200), Image.Resampling.LANCZOS)
-        img = ImageTk.PhotoImage(img)
-        self.reconstruct_image_label.configure(image=img)
-        self.reconstruct_image_label.image = img
 
 if __name__ == "__main__":
     app = App()
