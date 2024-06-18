@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 import cv2 as cv
 from tkinter import filedialog
 import numpy as np
+import matplotlib.pyplot as plt
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -158,47 +159,46 @@ class App(customtkinter.CTk):
         self.fourth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
 
         # 创建第五页面
-        # self.fifth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        # self.fifth_frame.grid_columnconfigure(0, weight=1)
-        # self.fifth_frame_text_1 = customtkinter.CTkLabel(self.fifth_frame, text="给定图片的基础，单应矩阵估计", font=large_font)
-        # self.fifth_frame_text_1.grid(row=1, column=0, padx=20, pady=10)
         self.fifth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
         self.fifth_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
         self.fifth_frame.grid_columnconfigure(0, weight=1)
-        self.fifth_frame.grid_columnconfigure(1, weight=1)
-        self.fifth_frame.grid_columnconfigure(2, weight=1)
         self.fifth_frame.grid_columnconfigure(3, weight=1)
-
-        self.fifth_frame_text_1 = customtkinter.CTkLabel(self.fifth_frame, text="给定图片的基础，单应矩阵估计",
-                                                         font=large_font)
+        self.fifth_frame.grid_rowconfigure(1, weight=1)
+        self.fifth_frame.grid_rowconfigure(4, weight=1)
+        # 页面5标题
+        self.fifth_frame_text_1 = customtkinter.CTkLabel(self.fifth_frame, text="给定图片的基础，单应矩阵估计", font=large_font)
         self.fifth_frame_text_1.grid(row=1, column=0, columnspan=4, padx=20, pady=10)
-
-        # 图片标签
-        self.image_label_left = customtkinter.CTkLabel(self.fifth_frame, text="左")
+        # 加载图片并调整大小
+        left_image_5 = Image.open("I1.bmp")
+        right_image_5 = Image.open("I2.bmp")
+        max_size = (200, 150)
+        left_image_5.thumbnail(max_size, Image.Resampling.LANCZOS)
+        right_image_5.thumbnail(max_size, Image.Resampling.LANCZOS)
+        left_photo = ImageTk.PhotoImage(left_image_5)
+        right_photo = ImageTk.PhotoImage(right_image_5)
+        # 图片显示
+        self.image_label_left = customtkinter.CTkLabel(self.fifth_frame, image=left_photo, text="")
+        self.image_label_left.image = left_photo
         self.image_label_left.grid(row=2, column=2, padx=10, pady=10)
-        self.image_label_right = customtkinter.CTkLabel(self.fifth_frame, text="右")
+        self.image_label_right = customtkinter.CTkLabel(self.fifth_frame, image=right_photo, text="")
+        self.image_label_right.image = right_photo
         self.image_label_right.grid(row=2, column=3, padx=10, pady=10)
-
-        # 设置按钮
-        self.feature_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="特征关系抽取",
-                                                                 command=self.extract_features)
-        self.feature_extraction_button.grid(row=3, column=0, columnspan=4, padx=20, pady=10)
-
+        # 设置特征关系抽取按钮
+        self.feature_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="特征关系抽取", command=self.extract_features)
+        self.feature_extraction_button.grid(row=3, column=0, columnspan=4, padx=20, pady=5)
         # 结果展示图片
-        self.result_image_label = customtkinter.CTkLabel(self.fifth_frame, text="结果展示")
-        self.result_image_label.grid(row=4, column=0, columnspan=4, padx=20, pady=10)
-
+        self.result_image_label_5 = customtkinter.CTkLabel(self.fifth_frame, text="")
+        self.result_image_label_5.grid(row=4, column=0, columnspan=4, padx=20, pady=5)
         # 矩阵抽取按钮
-        self.matrix_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="矩阵抽取",
-                                                                command=self.extract_matrix)
-        self.matrix_extraction_button.grid(row=5, column=0, columnspan=4, padx=20, pady=10)
-
+        self.matrix_extraction_button = customtkinter.CTkButton(self.fifth_frame, text="矩阵抽取", command=self.matrix_features)
+        self.matrix_extraction_button.grid(row=5, column=0, columnspan=4, padx=20, pady=5)
         # 矩阵展示
+        self.h = None
+        self.f = None
         self.matrix_label_1 = customtkinter.CTkLabel(self.fifth_frame, text="")
         self.matrix_label_1.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
         self.matrix_label_2 = customtkinter.CTkLabel(self.fifth_frame, text="")
         self.matrix_label_2.grid(row=6, column=2, columnspan=2, padx=10, pady=10)
-
 
         # 创建第六页面
         self.sixth_frame = customtkinter.CTkFrame(self, corner_radius=0, fg_color="transparent")
@@ -338,26 +338,6 @@ class App(customtkinter.CTk):
         print(f"Selected Image 2 Path: {self.image4_path}")  # 打印路径
         if self.image4_path:
             self.label4.configure(text=f"输入图片二: {self.image4_path.split('/')[-1]}")
-
-    # 加载本地图片
-    def load_images(self):
-        left_image_path = "D:/cv test/examples_作业/I1.bmp"
-        right_image_path = "D:/cv test/examples_作业/I2.bmp"
-
-        left_image = Image.open(left_image_path)
-        right_image = Image.open(right_image_path)
-
-        max_size = (200, 200)
-        left_image.thumbnail(max_size, Image.Resampling.LANCZOS)
-        right_image.thumbnail(max_size, Image.Resampling.LANCZOS)
-
-        self.left_image_tk = ImageTk.PhotoImage(left_image)
-        self.right_image_tk = ImageTk.PhotoImage(right_image)
-
-        self.image_label_left.configure(image=self.left_image_tk)
-        self.image_label_left.image = self.left_image_tk
-        self.image_label_right.configure(image=self.right_image_tk)
-        self.image_label_right.image = self.right_image_tk
 
     #图像拼接相关函数
     def sift_keypoints_detect(image):
@@ -573,11 +553,8 @@ class App(customtkinter.CTk):
             # Define the size you want to resize the images to
             max_size = (200, 150)  # For example, resize to a maximum of 300x300 pixels
 
-            # Resize the images
             px_img_pil_1.thumbnail(max_size, Image.Resampling.LANCZOS)
             px_img_pil_2.thumbnail(max_size, Image.Resampling.LANCZOS)
-
-            # Convert to ImageTk format
             px_img_tk_1 = ImageTk.PhotoImage(px_img_pil_1)
             px_img_tk_2 = ImageTk.PhotoImage(px_img_pil_2)
 
@@ -592,11 +569,113 @@ class App(customtkinter.CTk):
         else:
             print("未找到足够的匹配点。")
 
+    # 特征图抽取
     def extract_features(self):
-        pass
+        img1 = cv.imread('I1.bmp', cv.IMREAD_GRAYSCALE)
+        img2 = cv.imread('I2.bmp', cv.IMREAD_GRAYSCALE)
 
-    def extract_matrix(self):
-        pass
+        # 初始化SIFT检测器
+        sift = cv.SIFT_create()
+
+        # 检测关键点和描述符
+        kp1, des1 = sift.detectAndCompute(img1, None)
+        kp2, des2 = sift.detectAndCompute(img2, None)
+
+        # 使用FLANN匹配器进行关键点匹配
+        index_params = dict(algorithm=1, trees=5)
+        search_params = dict(checks=50)
+        flann = cv.FlannBasedMatcher(index_params, search_params)
+        matches = flann.knnMatch(des1, des2, k=2)
+
+        # 应用比率测试以过滤好的匹配
+        good_matches = []
+        for m, n in matches:
+            if m.distance < 0.75 * n.distance:
+                good_matches.append(m)
+
+        # 绘制匹配结果
+        img_matches = cv.drawMatches(img1, kp1, img2, kp2, good_matches, None)
+        match_img_path = "img_matches.jpg"
+        cv.imwrite(match_img_path, img_matches)
+        match_img_pil = Image.open(match_img_path)
+        max_size_match = (200, 150)
+        match_img_pil.thumbnail(max_size_match, Image.Resampling.LANCZOS)
+        match_img_tk = ImageTk.PhotoImage(match_img_pil)
+
+        self.result_image_label_5.configure(image=match_img_tk)
+        self.result_image_label_5.image = match_img_tk
+        # plt.imshow(img_matches)
+        # plt.title('SIFT Matches')
+        # plt.show()
+
+    # 矩阵抽取
+    def matrix_features(self):
+        img1 = cv.imread('I1.bmp', cv.IMREAD_GRAYSCALE)
+        img2 = cv.imread('I2.bmp', cv.IMREAD_GRAYSCALE)
+
+        # 初始化SIFT检测器
+        sift = cv.SIFT_create()
+
+        # 检测关键点和描述符
+        kp1, des1 = sift.detectAndCompute(img1, None)
+        kp2, des2 = sift.detectAndCompute(img2, None)
+
+        # 使用FLANN匹配器进行关键点匹配
+        index_params = dict(algorithm=1, trees=5)
+        search_params = dict(checks=50)
+        flann = cv.FlannBasedMatcher(index_params, search_params)
+        matches = flann.knnMatch(des1, des2, k=2)
+
+        # 应用比率测试以过滤好的匹配
+        good_matches = []
+        for m, n in matches:
+            if m.distance < 0.75 * n.distance:
+                good_matches.append(m)
+
+        # 绘制匹配结果
+        img_matches = cv.drawMatches(img1, kp1, img2, kp2, good_matches, None)
+        match_img_path = "img_matches.jpg"
+        cv.imwrite(match_img_path, img_matches)
+        match_img_pil = Image.open(match_img_path)
+        max_size_match = (200, 150)
+        match_img_pil.thumbnail(max_size_match, Image.Resampling.LANCZOS)
+        match_img_tk = ImageTk.PhotoImage(match_img_pil)
+
+        # self.result_image_label_5.configure(image=match_img_tk)
+        # self.result_image_label_5.image = match_img_tk
+        # plt.imshow(img_matches)
+        # plt.title('SIFT Matches')
+        # plt.show()
+
+        # 提取好的匹配点坐标
+        points1 = np.zeros((len(good_matches), 2), dtype=np.float32)
+        points2 = np.zeros((len(good_matches), 2), dtype=np.float32)
+
+        for i, match in enumerate(good_matches):
+            points1[i, :] = kp1[match.queryIdx].pt
+            points2[i, :] = kp2[match.trainIdx].pt
+
+        # 检查是否有足够的匹配点进行四点法计算
+        if len(good_matches) >= 4:
+            # 取得分最高的四个匹配点
+            best_matches = sorted(good_matches, key=lambda x: x.distance)[:4]
+            selected_points1 = np.float32([kp1[m.queryIdx].pt for m in best_matches]).reshape(-1, 1, 2)
+            selected_points2 = np.float32([kp2[m.trainIdx].pt for m in best_matches]).reshape(-1, 1, 2)
+
+            # 计算单应矩阵
+            self.h, status = cv.findHomography(selected_points1, selected_points2, cv.RANSAC, 5.0)
+            print("使用自动选定的四个点计算的单应矩阵:\n", self.h)
+        else:
+            print("匹配点不足四对，无法使用四点法计算单应矩阵。")
+
+        # 计算基础矩阵
+        self.f, mask = cv.findFundamentalMat(points1, points2, cv.FM_8POINT)
+        print("基础矩阵:\n", self.f)
+        h_str = np.array2string(self.h, precision=2, separator=', ')
+        f_str = np.array2string(self.f, precision=2, separator=', ')
+        self.matrix_label_1.configure(text=f"Homography Matrix (h):\n{h_str}")
+        self.matrix_label_2.configure(text=f"Fundamental Matrix (f):\n{f_str}")
+
 
 if __name__ == "__main__":
     app = App()
